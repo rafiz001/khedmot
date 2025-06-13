@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
-class NavBar extends StatefulWidget {
+import 'package:khedmot/data/valueNotifier.dart';
+class NavBar extends StatelessWidget {
   NavBar({Key? key}) : super(key: key);
 
-  @override
-  _NavBarState createState() => _NavBarState();
-}
-
-class _NavBarState extends State<NavBar> {
-   int currentIndex = 0;
-  @override
+ @override
   Widget build(BuildContext context) {
-    return Container(
-       child: NavigationBar(destinations: [
+    return ValueListenableBuilder(valueListenable: selectedPageNotifier, builder: (context, selectedPage, child) {
+      return NavigationBar(destinations: [
       NavigationDestination(icon: Icon(Icons.calculate_outlined), label: "পারসেন্ট"),
       NavigationDestination(icon: Icon(Icons.calendar_month_outlined), label: "মাসিক হিসাব"),
       
      ],
      height: 60,
-     selectedIndex: currentIndex,
+     selectedIndex: selectedPage,
      onDestinationSelected: (value) {
-       setState(() {
-         currentIndex = value;
-       });
-     },),
+       selectedPageNotifier.value = value;
+     },
     );
+    },);
   }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:khedmot/data/valueNotifier.dart';
+import 'package:khedmot/pages/months.dart';
 import 'package:khedmot/pages/nav_bar.dart';
+import 'package:khedmot/pages/persent.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,13 +46,14 @@ class HomePage extends StatelessWidget {
         foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         title: const Text("খেদমত"),
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('You have pushed the button this many times:'),
-          ],
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ValueListenableBuilder(
+            valueListenable: selectedPageNotifier,
+            builder: (BuildContext context, dynamic selectedPage, Widget? child) {
+               return  selectedPage==0?Persent():Months();
+            },
+         ),
       ),
       bottomNavigationBar: NavBar(),
     );
