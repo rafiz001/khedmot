@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:khedmot/pages/nav_bar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,80 +17,41 @@ class MyApp extends StatelessWidget {
           seedColor: Colors.green,
           brightness: Brightness.light,
         ),
+        useMaterial3: true,
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.green,
           brightness: Brightness.dark,
         ),
+        useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'খেদমত'),
+      home: const HomePage(), 
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  int currentIndex = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer, 
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        title: const Text("খেদমত"),
       ),
-      body: Center(
-
+      body: const Center(
         child: Column(
-          
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            ElevatedButton(onPressed: _incrementCounter, child: Text("Tap me"))
+            Text('You have pushed the button this many times:'),
           ],
         ),
       ),
-     bottomNavigationBar: NavigationBar(destinations: [
-      NavigationDestination(icon: Icon(Icons.calculate_outlined), label: "% Calc"),
-      NavigationDestination(icon: Icon(Icons.calendar_month_outlined), label: "Months"),
-      
-     ],
-     selectedIndex: currentIndex,
-     onDestinationSelected: (value) {
-       setState(() {
-         currentIndex = value;
-       });
-     },),
+      bottomNavigationBar: NavBar(),
     );
   }
 }
