@@ -3,6 +3,7 @@ import 'package:khedmot/data/valueNotifier.dart';
 import 'package:khedmot/pages/months.dart';
 import 'package:khedmot/pages/nav_bar.dart';
 import 'package:khedmot/pages/persent.dart';
+import 'package:khedmot/widgets/drawer_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +31,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
-      home: const HomePage(), 
+
+      home: const HomePage(),
     );
   }
 }
@@ -42,19 +44,20 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer, 
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         title: const Text("খেদমত"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ValueListenableBuilder(
-            valueListenable: selectedPageNotifier,
-            builder: (BuildContext context, dynamic selectedPage, Widget? child) {
-               return  selectedPage==0?Persent():Months();
-            },
-         ),
+          valueListenable: selectedPageNotifier,
+          builder: (BuildContext context, dynamic selectedPage, Widget? child) {
+            return selectedPage == 0 ? Persent() : Months();
+          },
+        ),
       ),
+      drawer: DrawerWidget(),
       bottomNavigationBar: NavBar(),
     );
   }
