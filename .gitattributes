@@ -9,3 +9,5 @@ macos/* linguist-vendored
 *.cmake linguist-vendored
 *.m linguist-vendored
 *.h linguist-vendored
+*.cpp linguist-vendored
+*.cc linguist-vendored
