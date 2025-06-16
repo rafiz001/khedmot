@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:khedmot/data/valueNotifier.dart';
+import 'package:khedmot/data/database_helper.dart';
+
 
 class DrawerWidget extends StatefulWidget {
   DrawerWidget({Key? key}) : super(key: key);
@@ -9,9 +10,24 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+  final DatabaseHelper _dbHelper = DatabaseHelper();
   final TextEditingController percentNumberController = TextEditingController(
-    text: "${percentNumberNotifier.value}%",
+    text: "---%",
   );
+
+  @override
+  void initState() { 
+    super.initState();
+    _refreshUserList();
+  }
+
+   Future<void> _refreshUserList() async {
+    final data = await _dbHelper.getPersent();
+    setState(() {
+      percentNumberController.value = TextEditingValue(text: "$data%");
+    });
+  }
+
   @override
   void dispose() {
     percentNumberController.dispose();
@@ -41,7 +57,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               onPressed: () {
                 String percentString =
                     percentNumberController.text.split("%")[0];
-                    percentNumberNotifier.value= int.parse(percentString);
+     //  ---------------------- percentNumberNotifier.value= int.parse(percentString);
                 Navigator.pop(context);//closing drawer
                 ScaffoldMessenger.of(
                   context,
