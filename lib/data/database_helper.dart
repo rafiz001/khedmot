@@ -1,13 +1,12 @@
 import 'dart:async';
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
-
   factory DatabaseHelper() => _instance;
-
   static Database? _database;
 
   DatabaseHelper._internal();
@@ -19,28 +18,23 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    try {
-      String path = join(await getDatabasesPath(), 'khedmot.db');
-      return await openDatabase(path, version: 1, onCreate: _onCreate);
-    } catch (e) {
-      sqfliteFfiInit(); // Initialize FFI
+    // Initializing FFI if not on mobile or web
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
-
-      String path = join(
-        await databaseFactory.getDatabasesPath(),
-        'khedmot.db',
-      );
-      return await databaseFactory.openDatabase(
-        path,
-        options: OpenDatabaseOptions(version: 1, onCreate: _onCreate),
-      );
     }
+
+    final path = join(await getDatabasesPath(), 'khedmot.db');
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: _onCreate,
+    );
   }
 
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE months(
+      CREATE TABLE IF NOT EXISTS months(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         active INTEGER,
@@ -58,14 +52,21 @@ class DatabaseHelper {
         dec INTEGER
       )
     ''');
+
     await db.execute('''
-      CREATE TABLE settings(
+      CREATE TABLE IF NOT EXISTS settings(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         persent INTEGER
       )
     ''');
-    await db.insert('settings', {"persent": 25});
+
+
+    final existingSettings = await db.query('settings');
+    if (existingSettings.isEmpty) {
+      await db.insert('settings', {"persent": 25});
+    }
   }
+
 
   // Get persent
 

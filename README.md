@@ -1,17 +1,21 @@
 # khedmot
 
-A new Flutter project.
+This is a flutter based app that helps to take note on earning sources and to calculate percentage (made for learning purpose).
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Linux
 
-A few resources to get you started if this is your first Flutter project:
+`libsqlite3` and `libsqlite3-dev` linux packages are required.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+One time setup for Ubuntu (to run as root):
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+dart tool/linux_setup.dart
+```
 
+or
+
+```
+sudo apt-get -y install libsqlite3-0 libsqlite3-dev
+```
