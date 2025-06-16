@@ -30,9 +30,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             TextField(
               keyboardType: TextInputType.number,
               controller: percentNumberController,
+              style: Theme.of(context).textTheme.bodyMedium,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'পাররসেন্ট',
+                labelText: 'পারসেন্ট',
               ),
             ),
             SizedBox(height: 10),

@@ -17,20 +17,21 @@ class _PersentState extends State<Persent> {
         children: [
           Text(
             '$theNumber এর ${percentNumberNotifier.value} % = ${theNumber * percent} ',
-            style: TextStyle(fontSize: 20),
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           Text(
             '$theNumber + ${theNumber * percent} = ${theNumber + theNumber * percent}',
-            style: TextStyle(fontSize: 15, color: Colors.green),
+            style: TextStyle(fontSize: 20, color: Colors.green),
           ),
           Text(
             '$theNumber - ${theNumber * percent} = ${theNumber - theNumber * percent}',
-            style: TextStyle(fontSize: 15, color: Colors.red),
+            style: TextStyle(fontSize: 20, color: Colors.red),
           ),
           TextField(
             autofocus: true,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(hintText: "নাম্বার লিখুন"),
+            style: Theme.of(context).textTheme.bodyMedium,
             onChanged: (value) {
               setState(() {
                 double? numberLocal = double.tryParse(value);
