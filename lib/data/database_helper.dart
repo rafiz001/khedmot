@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
+import 'dart:io' show Directory, File, Platform;
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -25,11 +27,7 @@ class DatabaseHelper {
     }
 
     final path = join(await getDatabasesPath(), 'khedmot.db');
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _onCreate,
-    );
+    return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
   Future _onCreate(Database db, int version) async {
@@ -60,13 +58,11 @@ class DatabaseHelper {
       )
     ''');
 
-
     final existingSettings = await db.query('settings');
     if (existingSettings.isEmpty) {
       await db.insert('settings', {"persent": 25});
     }
   }
-
 
   // Get persent
 
@@ -75,12 +71,13 @@ class DatabaseHelper {
     var result = await db.query('settings', where: 'id = ?', whereArgs: [1]);
     return result.first["persent"];
   }
+
   // Update persent
   Future<int> updatePersent(int number) async {
     Database db = await database;
     return await db.update(
       'settings',
-      {"persent":number},
+      {"persent": number},
       where: 'id = ?',
       whereArgs: [1],
     );
@@ -121,6 +118,7 @@ class DatabaseHelper {
     Database db = await database;
     return await db.delete('months', where: 'id = ?', whereArgs: [id]);
   }
+
   // Get month aggregate
   Future<List<Map<String, dynamic>>> getSum() async {
     Database db = await database;
@@ -140,5 +138,55 @@ SELECT
     SUM(dec) AS dec_sum
 FROM months;
 ''');
+  }
+
+  getDbPath() async {
+    String dbPath = await getDatabasesPath();
+    print("db path: $dbPath");
+
+    Directory? external = await getExternalStorageDirectory();
+    print("ffffffffff: $external");
+  }
+
+  Future<bool> backupDB() async {
+    var status = await Permission.manageExternalStorage.status;
+    if (!status.isGranted) {
+      await Permission.manageExternalStorage.request();
+    }
+    var status2 = await Permission.storage.status;
+    if (!status2.isGranted) {
+      await Permission.storage.request();
+    }
+    try {
+      File ourDB = File(
+        "/data/user/0/com.example.khedmot/databases/khedmot.db",
+      );
+      Directory? toSave = Directory("/storage/emulated/0/khedmot");
+      await toSave.create();
+      await ourDB.copy("${toSave.path}/khedmot.db");
+    } catch (e) {
+      //print("Backup error: ${e.toString()}");
+      return false;
+    }
+    return true;
+  }
+
+  Future<bool> restoreDB() async {
+    var status = await Permission.manageExternalStorage.status;
+    if (!status.isGranted) {
+      await Permission.manageExternalStorage.request();
+    }
+    var status2 = await Permission.storage.status;
+    if (!status2.isGranted) {
+      await Permission.storage.request();
+    }
+    try {
+      File savedDB = File("/storage/emulated/0/khedmot/khedmot.db");
+      savedDB.copy("/data/user/0/com.example.khedmot/databases/khedmot.db");
+    } catch (e) {
+      //print("Restore error: ${e.toString()}");
+      return false;
+    }
+    return true;
   }
 }

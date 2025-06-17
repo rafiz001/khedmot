@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:khedmot/data/database_helper.dart';
-import 'package:khedmot/data/valueNotifier.dart';
 
 class Persent extends StatefulWidget {
   Persent({super.key});

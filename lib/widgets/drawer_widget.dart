@@ -85,15 +85,41 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
                   SizedBox(height: 100),
                   OutlinedButton(
-                    onPressed: () {
-                      //final directory = await getExternalStorageDirectory();
+                    onPressed: () async {
+                      bool status = await _dbHelper.backupDB();
+                      if (status) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("ব্যাকাপ হয়ে গেছে")),
+                        );
+                      }
+
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.download),
                         SizedBox(width: 10),
-                        Text("ডাউনলোড ডেটা"),
+                        Text("ব্যাকাপ ডেটা"),
+                      ],
+                    ),
+                  ),
+                  OutlinedButton(
+                    onPressed: () async {
+                      bool status = await _dbHelper.restoreDB();
+                      if (status) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("রিস্টোর হয়ে গেছে")),
+                        );
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.upload),
+                        SizedBox(width: 10),
+                        Text("রিস্টোর ডেটা"),
                       ],
                     ),
                   ),

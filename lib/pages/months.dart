@@ -117,7 +117,7 @@ class _MonthsState extends State<Months> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(months[index][0], textAlign: TextAlign.center),
-                                Text("${data[0][months[index][1]]}৳", textAlign: TextAlign.center),
+                                Text("${data[0][months[index][1]]??"---"}৳", textAlign: TextAlign.center),
                               ],
                             ),
                           ),
