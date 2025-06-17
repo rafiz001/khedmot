@@ -94,25 +94,7 @@ class _MonthsState extends State<Months> {
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           child: InkWell(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder:
-                                    (context) => AlertDialog(
-                                      title: const Text('Alert!'),
-                                      content: Text(months[index][0]),
-                                      actions: [
-                                        TextButton(
-                                          onPressed:
-                                              () => Navigator.pop(
-                                                context,
-                                              ), // Close dialog
-                                          child: const Text('OK'),
-                                        ),
-                                      ],
-                                    ),
-                              );
-                            },
+                            onTap: () { },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
