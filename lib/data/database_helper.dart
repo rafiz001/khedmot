@@ -75,7 +75,16 @@ class DatabaseHelper {
     var result = await db.query('settings', where: 'id = ?', whereArgs: [1]);
     return result.first["persent"];
   }
-
+  // Update persent
+  Future<int> updatePersent(int number) async {
+    Database db = await database;
+    return await db.update(
+      'settings',
+      {"persent":number},
+      where: 'id = ?',
+      whereArgs: [1],
+    );
+  }
   // Insert an entry
 
   Future<int> insertUser(Map<String, dynamic> user) async {
@@ -111,5 +120,25 @@ class DatabaseHelper {
   Future<int> deleteUser(int id) async {
     Database db = await database;
     return await db.delete('months', where: 'id = ?', whereArgs: [id]);
+  }
+  // Get month aggregate
+  Future<List<Map<String, dynamic>>> getSum() async {
+    Database db = await database;
+    return await db.rawQuery('''
+SELECT 
+    SUM(jan) AS jan_sum,
+    SUM(feb) AS feb_sum,
+    SUM(mar) AS mar_sum,
+    SUM(apr) AS apr_sum,
+    SUM(may) AS may_sum,
+    SUM(jun) AS jun_sum,
+    SUM(jul) AS jul_sum,
+    SUM(aug) AS aug_sum,
+    SUM(sep) AS sep_sum,
+    SUM(oct) AS oct_sum,
+    SUM(nov) AS nov_sum,
+    SUM(dec) AS dec_sum
+FROM months;
+''');
   }
 }

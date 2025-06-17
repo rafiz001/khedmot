@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:khedmot/data/database_helper.dart';
 import 'package:khedmot/pages/sources.dart';
 
 class Months extends StatefulWidget {
@@ -9,22 +10,52 @@ class Months extends StatefulWidget {
 }
 
 class _MonthsState extends State<Months> {
-  List<String> months = [
-    "জানুয়ারি",
-    "ফেব্রুয়ারি",
-    "মার্চ",
-    "এপ্রিল",
-    "মে",
-    "জুন",
-    "জুলাই",
-    "আগস্ট",
-    "সেপটেম্বর",
-    "অক্টোবর",
-    "নভেম্বর",
-    "ডিসেম্বর",
+  final DatabaseHelper _dbHelper = DatabaseHelper();
+  List<List<String>> months = [
+    ["জানুয়ারি","jan_sum"],
+    ["ফেব্রুয়ারি","feb_sum"],
+    ["মার্চ","mar_sum"],
+    ["এপ্রিল","apr_sum"],
+    ["মে","may_sum"],
+    ["জুন","jun_sum"],
+    ["জুলাই","jul_sum"],
+    ["আগস্ট","aug_sum"],
+    ["সেপটেম্বর","sep_sum"],
+    ["অক্টোবর","oct_sum"],
+    ["নভেম্বর","nov_sum"],
+    ["ডিসেম্বর","dec_sum"],
+  ];
+   List<Map<String, dynamic>> data = [
+    {
+      "jan_sum":"---",
+      "feb_sum":"---",
+      "mar_sum":"---",
+      "apr_sum":"---",
+      "may_sum":"---",
+      "jun_sum":"---",
+      "jul_sum":"---",
+      "aug_sum":"---",
+      "sep_sum":"---",
+      "oct_sum":"---",
+      "nov_sum":"---",
+      "dec_sum":"---",
+    },
   ];
   @override
+  void initState() {
+    super.initState();
+    _refreshUserList();
+  }
+
+  Future<void> _refreshUserList() async {
+    data = await _dbHelper.getSum();
+    setState(() {
+      
+    });
+  }
+  @override
   Widget build(BuildContext context) {
+    _refreshUserList();
     return Column(
       children: [
         ElevatedButton(
@@ -48,9 +79,8 @@ class _MonthsState extends State<Months> {
           child: GridView.count(
             crossAxisCount: 3,
             children:
-                months
-                    .map(
-                      (month) => Padding(
+                List.generate( months.length,
+                      (index) => Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
                           decoration: BoxDecoration(
@@ -70,7 +100,7 @@ class _MonthsState extends State<Months> {
                                 builder:
                                     (context) => AlertDialog(
                                       title: const Text('Alert!'),
-                                      content: Text(month),
+                                      content: Text(months[index][0]),
                                       actions: [
                                         TextButton(
                                           onPressed:
@@ -86,8 +116,8 @@ class _MonthsState extends State<Months> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(month, textAlign: TextAlign.center),
-                                Text("000৳", textAlign: TextAlign.center),
+                                Text(months[index][0], textAlign: TextAlign.center),
+                                Text("${data[0][months[index][1]]}৳", textAlign: TextAlign.center),
                               ],
                             ),
                           ),

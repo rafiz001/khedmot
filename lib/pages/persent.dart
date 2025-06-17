@@ -1,22 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:khedmot/data/database_helper.dart';
 import 'package:khedmot/data/valueNotifier.dart';
 
 class Persent extends StatefulWidget {
-  Persent({Key? key}) : super(key: key);
+  Persent({super.key});
   @override
   _PersentState createState() => _PersentState();
 }
 
 class _PersentState extends State<Persent> {
+  final DatabaseHelper _dbHelper = DatabaseHelper();
   double theNumber = 0;
-  double percent = percentNumberNotifier.value / 100;
+  double percent = 0.10;
+  int percentInt = 0;
+  @override
+  void initState() {
+    super.initState();
+    _refreshUserList();
+  }
+
+  Future<void> _refreshUserList() async {
+    final data = await _dbHelper.getPersent();
+    setState(() {      
+    percent = data / 100;
+    percentInt = data;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
           Text(
-            '$theNumber এর ${percentNumberNotifier.value} % = ${theNumber * percent} ',
+            '$theNumber এর ${percentInt} % = ${theNumber * percent} ',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           Text(
