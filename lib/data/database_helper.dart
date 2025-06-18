@@ -5,12 +5,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Directory, File, Platform;
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:file_picker/file_picker.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   factory DatabaseHelper() => _instance;
   static Database? _database;
-
+  final dbname = "khedmot.db";
   DatabaseHelper._internal();
 
   Future<Database> get database async {
@@ -26,7 +28,7 @@ class DatabaseHelper {
       databaseFactory = databaseFactoryFfi;
     }
 
-    final path = join(await getDatabasesPath(), 'khedmot.db');
+    final path = join(await getDatabasesPath(), dbname);
     return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
@@ -140,53 +142,92 @@ FROM months;
 ''');
   }
 
-  getDbPath() async {
-    String dbPath = await getDatabasesPath();
-    print("db path: $dbPath");
+  Future<String> get _localDbPath async {
+    final dbPath = await getDatabasesPath();
+    return join(dbPath, dbname);
+  }
 
-    Directory? external = await getExternalStorageDirectory();
-    print("ffffffffff: $external");
+  Future<void> _requestAndroidPermissions() async {
+    if (!Platform.isAndroid) return;
+
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    if (androidInfo.version.sdkInt >= 30) {
+      await Permission.manageExternalStorage.request();
+    } else {
+      await Permission.storage.request();
+    }
   }
 
   Future<bool> backupDB() async {
-    var status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted) {
-      await Permission.manageExternalStorage.request();
-    }
-    var status2 = await Permission.storage.status;
-    if (!status2.isGranted) {
-      await Permission.storage.request();
-    }
     try {
-      File ourDB = File(
-        "/data/user/0/com.example.khedmot/databases/khedmot.db",
-      );
-      Directory? toSave = Directory("/storage/emulated/0/khedmot");
-      await toSave.create();
-      await ourDB.copy("${toSave.path}/khedmot.db");
+      if (Platform.isAndroid) await _requestAndroidPermissions();
+
+      final sourcePath = await _localDbPath;
+      final sourceFile = File(sourcePath);
+
+      if (!await sourceFile.exists()) {
+        throw Exception('Database file not found');
+      }
+
+      // For Linux: Suggest default download location
+      String? destinationPath;
+      if (Platform.isLinux) {
+        final downloadsDir = await getDownloadsDirectory();
+        destinationPath = await FilePicker.platform.saveFile(
+          type: FileType.custom,
+          dialogTitle: 'Export Database',
+          fileName: dbname,
+          initialDirectory: downloadsDir?.path,
+          allowedExtensions: ['db'],
+        );
+        if (destinationPath == null) return false;
+        await sourceFile.copy(destinationPath);
+      } else {
+        final bytes = await sourceFile.readAsBytes();
+        destinationPath = await FilePicker.platform.saveFile(
+          type: FileType.custom,
+          dialogTitle: 'Export Database',
+          fileName: dbname,
+          allowedExtensions: ['db'],
+          bytes: bytes,
+        );
+      }
+
+      if (destinationPath == null) return false;
+
+      return true;
     } catch (e) {
-      //print("Backup error: ${e.toString()}");
+      //print('Export error: $e');
       return false;
     }
-    return true;
   }
 
   Future<bool> restoreDB() async {
-    var status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted) {
-      await Permission.manageExternalStorage.request();
-    }
-    var status2 = await Permission.storage.status;
-    if (!status2.isGranted) {
-      await Permission.storage.request();
-    }
     try {
-      File savedDB = File("/storage/emulated/0/khedmot/khedmot.db");
-      savedDB.copy("/data/user/0/com.example.khedmot/databases/khedmot.db");
+      if (Platform.isAndroid) await _requestAndroidPermissions();
+
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        //allowedExtensions: ['db', 'sqlite'],
+        dialogTitle: 'Select Database File',
+      );
+
+      if (result == null) return false;
+
+      final sourcePath = result.files.single.path!;
+      final destPath = await _localDbPath;
+
+      // Close existing connection if open
+
+      _database = null;
+
+      await File(sourcePath).copy(destPath);
+
+      _database = await database;
+      return true;
     } catch (e) {
-      //print("Restore error: ${e.toString()}");
+      //print('Import error: $e');
       return false;
     }
-    return true;
   }
 }
